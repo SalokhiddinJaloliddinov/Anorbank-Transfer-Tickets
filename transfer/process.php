@@ -1,7 +1,7 @@
 <?php
     session_start();
 
-$mysqli = new mysqli('hostname', 'username', 'db_password', 'db_name') or die(mysqli_error($mysqli));
+$mysqli = new mysqli('localhost', 'root', 'Jumanji99%RFgVarMMech', 'itop_anorbank') or die(mysqli_error($mysqli));
 
     if (isset($_POST['save'])) {
         $id = $_POST['id'];

@@ -80,7 +80,7 @@ class AddMenuSampleExtension implements iPopupMenuExtension
 			$oProfileSet = new DBObjectSet($oSearch);
 			$oProfile = $oProfileSet->Fetch();
 			$iProfileName = $oProfile->Get('name');
-			if ($iProfileName == "Administrator") {
+			if ($iProfileName == "Administrator" OR $iProfileName == "Accident Manager") {
 				if ($param instanceof Ticket)
 				{
 					// add a separator

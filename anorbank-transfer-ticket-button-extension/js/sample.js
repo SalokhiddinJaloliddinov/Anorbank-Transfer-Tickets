@@ -28,62 +28,102 @@ function MyCustomJSFunction(sName)
 	  $("body").append($div);
 	  $("#foo").css({"width": "100%", "height": "200px", "background-color": "red", "z-index": "99999", "position": "absolute"}); */
 
+	  
 	let $div = $("<div>", {id: "dialog", "title": "Basic dialog"});
-	let pipi = "<p>Выберите Услугу и подкатегорию</p>";
-	let pipi_button = $("<button>", {id: "pipi_button"});
-	let pipi_select = $("<select>", {id: "pipi_select"});
-	let pipi_select_2 = $("<select>", {id: "pipi_select_2"});
+	let service_label = "<p>Выберите Услугу</p>";
+	let servicesubcategory_label = "<p>Выберите Подкатегорию</p>";
+	let transfer_button = $("<button>", {id: "transfer_button"});
+	let select_service = $("<select>", {id: "select_service"});
+	let select_servicesubcategory = $("<select>", {id: "select_servicesubcategory"});
+	let transfer_to = $("<select>", {id: "transfer_to"});
+	
 	
 	$("body").append($div);
+	$("#dialog").append(transfer_to);
+	$("#transfer_to").append("<option value='' selected>-- Выберите --</option>")
 	if (sName.includes('D')) {
-		$("#dialog").append("<select id='transfer_to'><option value='I'>Инцидент</option><option value='R'>Заявка</option></select>");
+		$("#transfer_to").append("<option value='I'>Инцидент</option><option value='R'>Заявка</option>");
 	} else if (sName.includes('R')) {
-		$("#dialog").append("<select id='transfer_to'><option value='I'>Инцидент</option><option value='D'>Доставка Карт</option></select>");
+		$("#transfer_to").append("<option value='I'>Инцидент</option><option value='D'>Доставка Карт</option>");
 	} else if (sName.includes('I')) {
-		$("#dialog").append("<select id='transfer_to'><option value='R'>Заявка</option><option value='D'>Доставка Карт</option></select>");
+		$("#transfer_to").append("<option value='R'>Заявка</option><option value='D'>Доставка Карт</option>");
 	}
-	$("#dialog").append(pipi, pipi_select, pipi_select_2, pipi_button);
-	$("#pipi_button").append("<b>Трансфер</b>");
+	$("#dialog").append(service_label, select_service, "<br><br>", servicesubcategory_label, select_servicesubcategory, "<br><br>", transfer_button);
+	$("#transfer_button").append("<b>Трансфер</b>");
 	$(function(){
 		$("#dialog").dialog({
 			minWidth: 700,
 			title: "Перекидка тикетов"
 		});
-	})	
-	var service = {
-		"url": "https://testdesk.anorbank.uz/sd_api/api/post/",
-		"method": "POST",
-		"timeout": 0,
-	};
+	})
+	$("#select_service").append("<option value='' selected>-- Выберите --</option")
 
-	var servicesubcategory = {
-		"url": "https://testdesk.anorbank.uz/sd_api/api/post/servicesubcategory.php",
-		"method": "POST",
-		"timeout": 0,
-	};
 
-		  
-	$.ajax(service).done(function (response) {
+	$("#transfer_to").change(function() {
+		var val_type = $("#transfer_to").val();
+		if (val_type === "I") {
+			var type = 'incident';
+		} else if (val_type === "R") {
+			var type = 'service_request';
+		} else if (val_type === "D") {
+			var type = 'delivery_request';
+		}
+		
+		var service = {
+			"url": "https://testdesk.anorbank.uz/sd_api/api/post/index.php?type="+type+"",
+			"method": "POST",
+			"timeout": 0,
+		};
+
+		$.ajax(service).done(function (response) {
+			$("#select_service").children().remove();
+			$("#select_service").append("<option value='' selected>-- Выберите --</option>");
+			console.log(response);
+			$.each(response, function(i,res) {
+			$("#select_service").append("<option value='" + res.id + "'>" + res.name + "</option>");
+			});		
+		});
+	})	  
+	
+	/* $.ajax(servicesubcategory).done(function (response) {
 		console.log(response);
 		$.each(response, function(i,res) {
-			$("#pipi_select").append("<option value='" + res.id + "'>" + res.name + "</option>");
-		});		
-	});
-
-	$("#pipi_select").change(function() {
-		let $selectval = $("#pipi_select").val();
-	});
-	$.ajax(servicesubcategory).done(function (response) {
-		console.log(response);
-		$.each(response, function(i,res) {
-			$("#pipi_select_2").append("<option value='" + res.id + "'>" + res.name + "</option>");
+			$("#select_servicesubcategory").append("<option value='" + res.id + "'>" + res.name + "</option>");
 			
 		});		
-	});
+	}); */
 
-	$("#pipi_button").click(function() {
-		var attr_service_id = $("#pipi_select").val();
-		var attr_servicesubcategory_id = $("#pipi_select_2").val();
+	$("#select_service").change(function()
+	  {
+		var val = $("#select_service").val();
+		var val_type = $("#transfer_to").val();
+		if (val_type === "I") {
+			var type = 'incident';
+			alert(sName);
+		} else if (val_type === "R") {
+			var type = 'service_request';
+		} else if (val_type === "D") {
+			var type = 'delivery_request';
+		}
+		var settings = {
+			"url": "https://testdesk.anorbank.uz/sd_api/api/post/servicesubcategory.php?id="+val+"&type=" + type +"",
+			"method": "POST",
+			"timeout": 0,
+		  };
+		  
+		  $.ajax(settings).done(function (response) {
+			$("#select_servicesubcategory").children().remove();
+			console.log(response);
+			$.each(response, function(i,res) {
+				$("#select_servicesubcategory").append("<option value='" + res.id + "'>" + res.name + "</option>");
+			});	
+		  });
+	  });	
+	
+
+	$("#transfer_button").click(function() {
+		var attr_service_id = $("#select_service").val();
+		var attr_servicesubcategory_id = $("#select_servicesubcategory").val();
 		var transfer_to = $("#transfer_to").val();
 		var settings = {
 			"url": "https://testdesk.anorbank.uz/pages/transfer/process.php",
