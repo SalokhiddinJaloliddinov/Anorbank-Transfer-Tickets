@@ -1,9 +1,9 @@
 <?php
     class Database {
         private $host = 'localhost';
-        private $db_name = 'itop_anorbank';
-        private $username = 'root';
-        private $password = 'Jumanji99%RFgVarMMech';
+        private $db_name = 'db_name';
+        private $username = 'hostname';
+        private $password = 'password';
         private $conn;
 
         // DB Connect
